@@ -1,29 +1,108 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { useEffect } from "react";
 import "./App.scss";
+import RefreshIcon from "./components/atoms/RefreshIcon/RefreshIcon.tsx";
+import IconButton from "./components/molecules/IconButton/IconButton.tsx";
+import { type CardProps } from "./components/molecules/Card/Card.tsx";
+import CardContainer from "./components/organisms/CardContainer/CardContainer.tsx";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const handleClick = () => {
+    console.log("press");
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space" || e.key === " ") {
+        e.preventDefault();
+        handleClick();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const cards: CardProps[] = [
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: false,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: true,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: false,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: true,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: false,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: true,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: false,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: true,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: false,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+    {
+      imgSrc:
+        "https://media4.giphy.com/media/v1.Y2lkPTAxNWYyY2MzeXl0bXgxaW9ocTVienh5N3F1MDNmOWJvOHB3MHRoamZzNmswdGlqdCZlcD12MV9naWZzX3JhbmRvbSZjdD1n/9rr8tmC2cmDv7T7JZG/200w.gif",
+      isLocked: true,
+      date: "2025-05-05",
+      label: "#leisure #ba",
+    },
+  ];
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+      <h1>Giphy</h1>
+      <CardContainer cards={cards} />
+      {/*TODO: fix key*/}
+      <IconButton icon={<RefreshIcon />} onClick={handleClick}>
+        Hit here to refresh gifs or press space
+      </IconButton>
     </>
   );
 }
