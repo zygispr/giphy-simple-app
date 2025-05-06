@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks.ts";
 import { selectCards } from "../../store/selectors.ts";
 import { toggleLock } from "../../store/slice.ts";
@@ -7,16 +7,16 @@ import IconButton from "../molecules/IconButton/IconButton.tsx";
 import RefreshIcon from "../atoms/RefreshIcon/RefreshIcon.tsx";
 import { loadGalleryThunk, updateGalleryThunk } from "../../store/thunks.ts";
 
-const GALLERY_LIMIT = 3;
+const GALLERY_LIMIT = 1;
 
 function GalleryPage() {
   const cards = useAppSelector(selectCards);
   const dispatch = useAppDispatch();
   const hasPageLoaded = useRef(false);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     dispatch(updateGalleryThunk());
-  };
+  }, [dispatch]);
 
   const handleLock = (id: string) => {
     dispatch(toggleLock(id));
@@ -37,7 +37,7 @@ function GalleryPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [dispatch, handleRefresh]);
 
   return (
     <>

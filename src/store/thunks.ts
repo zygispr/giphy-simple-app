@@ -39,7 +39,7 @@ const fetchGifs = async (limit: number): Promise<CardProps[]> => {
     );
     console.log(response);
     if (!response.ok) {
-      console.error(`Giphy API error: ${response.statusText}`);
+      console.error(`Giphy API error (status code: ${response.status}, status text: ${response.statusText})`);
       return [];
     }
 
