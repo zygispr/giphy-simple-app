@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_TEST: string;
+  readonly VITE_GIPHY_API_KEY: string;
 }
 
 interface ImportMeta {
