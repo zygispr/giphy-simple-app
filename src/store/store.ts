@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { type Action, configureStore, type ThunkAction } from "@reduxjs/toolkit";
 import appReducer from "./slice";
 import { devLoggerMiddleware } from "./loggerMiddleware.ts";
 
@@ -15,3 +15,4 @@ export const store = configureStore({
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action<string>>;

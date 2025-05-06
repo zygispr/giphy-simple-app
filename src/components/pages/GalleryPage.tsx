@@ -1,17 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks.ts";
 import { selectCards } from "../../store/selectors.ts";
 import { toggleLock } from "../../store/slice.ts";
 import CardContainer from "../organisms/CardContainer/CardContainer.tsx";
 import IconButton from "../molecules/IconButton/IconButton.tsx";
 import RefreshIcon from "../atoms/RefreshIcon/RefreshIcon.tsx";
+import { loadGalleryThunk, updateGalleryThunk } from "../../store/thunks.ts";
+
+const GALLERY_LIMIT = 3;
 
 function GalleryPage() {
   const cards = useAppSelector(selectCards);
   const dispatch = useAppDispatch();
+  const hasPageLoaded = useRef(false);
 
   const handleRefresh = () => {
-    console.log("refresh");
+    dispatch(updateGalleryThunk());
   };
 
   const handleLock = (id: string) => {
@@ -19,6 +23,11 @@ function GalleryPage() {
   };
 
   useEffect(() => {
+    if (!hasPageLoaded.current) {
+      dispatch(loadGalleryThunk(GALLERY_LIMIT));
+      hasPageLoaded.current = true;
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.key === " ") {
         e.preventDefault();
