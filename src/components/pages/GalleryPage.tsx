@@ -1,13 +1,13 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks.ts";
 import { selectCards } from "../../store/selectors.ts";
-import { toggleLock } from "../../store/slice.ts";
 import CardContainer from "../organisms/CardContainer/CardContainer.tsx";
 import IconButton from "../molecules/IconButton/IconButton.tsx";
 import RefreshIcon from "../atoms/RefreshIcon/RefreshIcon.tsx";
-import { loadGalleryThunk, updateGalleryThunk } from "../../store/thunks.ts";
+import { loadGalleryThunk, toggleLockThunk, updateGalleryThunk } from "../../store/thunks.ts";
+import "./GalleryPage.scss";
 
-const GALLERY_LIMIT = 1;
+const GALLERY_LIMIT = 12;
 
 function GalleryPage() {
   const cards = useAppSelector(selectCards);
@@ -19,7 +19,7 @@ function GalleryPage() {
   }, [dispatch]);
 
   const handleLock = (id: string) => {
-    dispatch(toggleLock(id));
+    dispatch(toggleLockThunk(id));
   };
 
   useEffect(() => {
@@ -40,13 +40,13 @@ function GalleryPage() {
   }, [dispatch, handleRefresh]);
 
   return (
-    <>
+    <div id="gallery-page">
       <h1>Giphy</h1>
       <CardContainer cards={cards} onClick={handleLock} />
       <IconButton icon={<RefreshIcon />} onClick={handleRefresh}>
         Hit here to refresh gifs or press space
       </IconButton>
-    </>
+    </div>
   );
 }
 export default GalleryPage;

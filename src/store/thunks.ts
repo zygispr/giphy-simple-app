@@ -1,6 +1,8 @@
 import type { AppThunk } from "./store.ts";
 import type { CardProps } from "../components/molecules/Card/Card.tsx";
-import { setGallery } from "./slice.ts";
+import { setGallery, toggleLock } from "./slice.ts";
+import { getCardsFromLocalStorage, saveCardsToLocalStorage } from "../utils/storage.ts";
+import { selectCards } from "./selectors.ts";
 
 const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
 
@@ -17,6 +19,8 @@ interface GiphyImages {
 
 interface GiphyGif {
   id: string;
+  title: string;
+  import_datetime: string;
   images: GiphyImages;
 }
 
@@ -29,15 +33,13 @@ interface GiphyResponse {
 }
 
 const fetchGifs = async (limit: number): Promise<CardProps[]> => {
-  console.log(GIPHY_API_KEY);
   try {
-    const maxOffset = Math.max(0, 10 - limit);
+    const maxOffset = Math.max(0, 500 - limit);
     const offset = Math.floor(Math.random() * (maxOffset + 1));
 
     const response = await fetch(
-      `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&fields=id,images.fixed_width&limit=${limit}&offset=${0}&rating=g&bundle=messaging_non_clips`
+      `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&fields=id,title,import_datetime,images.fixed_width&limit=${limit}&offset=${offset}&rating=g&bundle=messaging_non_clips`
     );
-    console.log(response);
     if (!response.ok) {
       console.error(`Giphy API error (status code: ${response.status}, status text: ${response.statusText})`);
       return [];
@@ -51,8 +53,8 @@ const fetchGifs = async (limit: number): Promise<CardProps[]> => {
         id: `${element.id}-${date.getTime()}`, // there's a chance to retrieve same GIF, so need a unique id for key prop
         imgSrc: element.images.fixed_width.url,
         isLocked: false,
-        date: date.toISOString(),
-        label: "test",
+        date: element.import_datetime,
+        label: element.title,
       })
     );
   } catch (error) {
@@ -64,13 +66,15 @@ const fetchGifs = async (limit: number): Promise<CardProps[]> => {
 export const loadGalleryThunk =
   (limit: number = 12): AppThunk =>
   async (dispatch) => {
-    const cards = await fetchGifs(limit);
-    dispatch(setGallery(cards));
+    const lockedCards = getCardsFromLocalStorage().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const newLimit = limit - lockedCards.length;
+    const newCards = newLimit > 0 ? await fetchGifs(newLimit) : [];
+    const allCards = [...lockedCards, ...newCards];
+    dispatch(setGallery(allCards));
   };
 
 export const updateGalleryThunk = (): AppThunk => async (dispatch, getState) => {
-  const state = getState();
-  const currentCards = state.app.cards;
+  const currentCards = selectCards(getState());
   const unlockedCount = currentCards.filter((card) => !card.isLocked).length;
   if (unlockedCount === 0) {
     return;
@@ -82,3 +86,12 @@ export const updateGalleryThunk = (): AppThunk => async (dispatch, getState) => 
 
   dispatch(setGallery(mergedCards));
 };
+
+export const toggleLockThunk =
+  (id: string): AppThunk =>
+  async (dispatch, getState) => {
+    dispatch(toggleLock(id));
+    const cards = selectCards(getState());
+    const lockedCards = cards.filter((card) => card.isLocked);
+    saveCardsToLocalStorage(lockedCards);
+  };
