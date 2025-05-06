@@ -2,7 +2,7 @@ import type { AppThunk } from "./store.ts";
 import type { CardProps } from "../components/molecules/Card/Card.tsx";
 import { setGallery } from "./slice.ts";
 
-const GIPHY_API_KEY = "2cGcN1Ypi7jZ1sxWfDtLptZoLRd22KzI";
+const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
 
 interface GiphyImage {
   url: string;
@@ -29,8 +29,14 @@ interface GiphyResponse {
 }
 
 const fetchGifs = async (limit: number): Promise<CardProps[]> => {
+  console.log(GIPHY_API_KEY);
   try {
-    const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&fields=id,url,images.fixed_width&rating=g&limit=${limit}`);
+    const maxOffset = Math.max(0, 10 - limit);
+    const offset = Math.floor(Math.random() * (maxOffset + 1));
+
+    const response = await fetch(
+      `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&fields=id,images.fixed_width&limit=${limit}&offset=${0}&rating=g&bundle=messaging_non_clips`
+    );
     console.log(response);
     if (!response.ok) {
       console.error(`Giphy API error: ${response.statusText}`);
@@ -38,16 +44,14 @@ const fetchGifs = async (limit: number): Promise<CardProps[]> => {
     }
 
     const json: GiphyResponse = await response.json();
-    console.log(json);
-
-    const date = Date.now().toString();
+    const date = new Date();
 
     return json.data.map(
       (element: GiphyGif): CardProps => ({
-        id: `${element.id}-${date}`,
+        id: `${element.id}-${date.getTime()}`, // there's a chance to retrieve same GIF, so need a unique id for key prop
         imgSrc: element.images.fixed_width.url,
         isLocked: false,
-        date: date,
+        date: date.toISOString(),
         label: "test",
       })
     );
@@ -69,7 +73,6 @@ export const updateGalleryThunk = (): AppThunk => async (dispatch, getState) => 
   const currentCards = state.app.cards;
   const unlockedCount = currentCards.filter((card) => !card.isLocked).length;
   if (unlockedCount === 0) {
-    console.log("All GIFs are locked - no fetch needed");
     return;
   }
 
