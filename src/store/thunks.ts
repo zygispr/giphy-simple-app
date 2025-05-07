@@ -3,43 +3,27 @@ import type { CardProps } from "../components/molecules/Card/Card.tsx";
 import { setGallery, toggleLock } from "./slice.ts";
 import { getCardsFromLocalStorage, saveCardsToLocalStorage } from "../utils/storage.ts";
 import { selectCards } from "./selectors.ts";
+import type { GiphyGif, GiphyResponse } from "./models/giphyResponse.ts";
 
-const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
-
-interface GiphyImage {
-  url: string;
-  width: string;
-  height: string;
-  size: string;
-}
-
-interface GiphyImages {
-  fixed_width: GiphyImage;
-}
-
-interface GiphyGif {
-  id: string;
-  title: string;
-  import_datetime: string;
-  images: GiphyImages;
-}
-
-interface GiphyResponse {
-  data: GiphyGif[];
-  meta: {
-    status: number;
-    msg: string;
-  };
-}
+const { VITE_GIPHY_BASE_URL: GIPHY_BASE_URL, VITE_GIPHY_API_KEY: GIPHY_API_KEY, VITE_GIPHY_TOTAL_COUNT: GIPHY_TOTAL_COUNT } = import.meta.env;
 
 const fetchGifs = async (limit: number): Promise<CardProps[]> => {
   try {
-    const maxOffset = Math.max(0, 500 - limit);
+    const maxOffset = Math.max(0, GIPHY_TOTAL_COUNT - limit);
     const offset = Math.floor(Math.random() * (maxOffset + 1));
 
-    const response = await fetch(
-      `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&fields=id,title,import_datetime,images.fixed_width&limit=${limit}&offset=${offset}&rating=g&bundle=messaging_non_clips`
-    );
+    const endpoint = "v1/gifs/trending";
+    const queryParams = new URLSearchParams({
+      api_key: GIPHY_API_KEY,
+      fields: "id,title,import_datetime,images.fixed_width_downsampled",
+      limit: limit.toString(),
+      offset: offset.toString(),
+      rating: "g",
+      bundle: "messaging_non_clips",
+    });
+    const url = `${GIPHY_BASE_URL}/${endpoint}?${queryParams.toString()}`;
+
+    const response = await fetch(url);
     if (!response.ok) {
       console.error(`Giphy API error (status code: ${response.status}, status text: ${response.statusText})`);
       return [];
@@ -51,7 +35,7 @@ const fetchGifs = async (limit: number): Promise<CardProps[]> => {
     return json.data.map(
       (element: GiphyGif): CardProps => ({
         id: `${element.id}-${date.getTime()}`, // there's a chance to retrieve same GIF, so need a unique id for key prop
-        imgSrc: element.images.fixed_width.url,
+        imgSrc: element.images.fixed_width_downsampled.url,
         isLocked: false,
         date: element.import_datetime,
         label: element.title,
@@ -83,7 +67,6 @@ export const updateGalleryThunk = (): AppThunk => async (dispatch, getState) => 
   const newCards = await fetchGifs(unlockedCount);
   let i = 0;
   const mergedCards = currentCards.map((card) => (card.isLocked ? card : (newCards[i++] ?? card)));
-
   dispatch(setGallery(mergedCards));
 };
 
