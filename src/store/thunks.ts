@@ -1,11 +1,12 @@
 import type { AppThunk } from "./store.ts";
 import type { CardProps } from "../components/molecules/Card/Card.tsx";
 import { setGallery, toggleLock } from "./slice.ts";
-import { getCardsFromLocalStorage, saveCardsToLocalStorage } from "../utils/storage.ts";
+import { getFromLocalStorage, saveToLocalStorage } from "../utils/storage.ts";
 import { selectCards } from "./selectors.ts";
 import type { GiphyGif, GiphyResponse } from "./models/giphyResponse.ts";
 
 const { VITE_GIPHY_BASE_URL: GIPHY_BASE_URL, VITE_GIPHY_API_KEY: GIPHY_API_KEY, VITE_GIPHY_TOTAL_COUNT: GIPHY_TOTAL_COUNT } = import.meta.env;
+const GALLERY_LOCAL_STORAGE_KEY = "gallery_locked_cards";
 
 const fetchGifs = async (limit: number): Promise<CardProps[]> => {
   try {
@@ -48,13 +49,14 @@ const fetchGifs = async (limit: number): Promise<CardProps[]> => {
 };
 
 export const loadGalleryThunk =
-  (limit: number = 12): AppThunk =>
+  (count: number = 12): AppThunk =>
   async (dispatch) => {
-    const lockedCards = getCardsFromLocalStorage().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    const newLimit = limit - lockedCards.length;
-    const newCards = newLimit > 0 ? await fetchGifs(newLimit) : [];
-    const allCards = [...lockedCards, ...newCards];
-    dispatch(setGallery(allCards));
+    let cachedCards = getFromLocalStorage<CardProps[]>(GALLERY_LOCAL_STORAGE_KEY) ?? [];
+    cachedCards = cachedCards.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const fetchCount = count - cachedCards.length;
+    const fetchedCards = fetchCount > 0 ? await fetchGifs(fetchCount) : [];
+    const mergedCards = [...cachedCards, ...fetchedCards];
+    dispatch(setGallery(mergedCards));
   };
 
 export const updateGalleryThunk = (): AppThunk => async (dispatch, getState) => {
@@ -64,9 +66,9 @@ export const updateGalleryThunk = (): AppThunk => async (dispatch, getState) => 
     return;
   }
 
-  const newCards = await fetchGifs(unlockedCount);
+  const fetchedCards = await fetchGifs(unlockedCount);
   let i = 0;
-  const mergedCards = currentCards.map((card) => (card.isLocked ? card : (newCards[i++] ?? card)));
+  const mergedCards = currentCards.map((card) => (card.isLocked ? card : (fetchedCards[i++] ?? card)));
   dispatch(setGallery(mergedCards));
 };
 
@@ -76,5 +78,5 @@ export const toggleLockThunk =
     dispatch(toggleLock(id));
     const cards = selectCards(getState());
     const lockedCards = cards.filter((card) => card.isLocked);
-    saveCardsToLocalStorage(lockedCards);
+    saveToLocalStorage<CardProps[]>(GALLERY_LOCAL_STORAGE_KEY, lockedCards);
   };
