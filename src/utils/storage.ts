@@ -1,12 +1,8 @@
-import { type CardProps } from "../components/molecules/Card/Card.tsx";
-
-const LOCAL_STORAGE_KEY = "Gallery";
-
-export const saveCardsToLocalStorage = (cards: CardProps[]) => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cards));
+export const saveToLocalStorage = <T>(key: string, data: T): void => {
+  localStorage.setItem(key, JSON.stringify(data));
 };
 
-export const getCardsFromLocalStorage = (): CardProps[] => {
-  const json = localStorage.getItem(LOCAL_STORAGE_KEY);
-  return json ? (JSON.parse(json) as CardProps[]) : [];
+export const getFromLocalStorage = <T>(key: string): T | null => {
+  const json = localStorage.getItem(key);
+  return json ? (JSON.parse(json) as T) : null;
 };

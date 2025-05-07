@@ -1,18 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import * as reducers from "./reducers";
-import type { AppState } from "./models/appState.ts";
+import type { GalleryState } from "./models/galleryState.ts";
 
-const initialState: AppState = {
+const initialState: GalleryState = {
   cards: [],
 };
 
-const appSlice = createSlice({
-  name: "app",
+const gallerySlice = createSlice({
+  name: "gallery",
   initialState,
   reducers: reducers,
-  // TODO: add extra reducers
 });
 
-export const { toggleLock, setGallery } = appSlice.actions;
+export const { toggleLock, setGallery } = gallerySlice.actions;
 
-export default appSlice.reducer;
+export default gallerySlice.reducer;

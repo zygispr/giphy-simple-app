@@ -1,8 +1,8 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { AppState } from "./models/appState.ts";
+import type { GalleryState } from "./models/galleryState.ts";
 import type { CardProps } from "../components/molecules/Card/Card.tsx";
 
-export const toggleLock = (state: AppState, action: PayloadAction<string>) => {
+export const toggleLock = (state: GalleryState, action: PayloadAction<string>) => {
   const id = action.payload;
   const card = state.cards.find((card) => card.id === id);
   if (card) {
@@ -10,6 +10,6 @@ export const toggleLock = (state: AppState, action: PayloadAction<string>) => {
   }
 };
 
-export const setGallery = (state: AppState, action: PayloadAction<CardProps[]>) => {
+export const setGallery = (state: GalleryState, action: PayloadAction<CardProps[]>) => {
   state.cards = action.payload;
 };

@@ -1,5 +1,5 @@
 import type { CardProps } from "../../components/molecules/Card/Card.tsx";
 
-export interface AppState {
+export interface GalleryState {
   cards: CardProps[];
 }

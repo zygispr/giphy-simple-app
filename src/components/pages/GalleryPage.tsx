@@ -7,7 +7,7 @@ import RefreshIcon from "../atoms/RefreshIcon/RefreshIcon.tsx";
 import { loadGalleryThunk, toggleLockThunk, updateGalleryThunk } from "../../store/thunks.ts";
 import "./GalleryPage.scss";
 
-const GALLERY_LIMIT = 12;
+const GALLERY_LIMIT = 12; // Could be an input to allow the user to get the number of GIFs they want to see
 
 function GalleryPage() {
   const cards = useAppSelector(selectCards);
