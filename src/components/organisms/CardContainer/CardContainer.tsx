@@ -10,7 +10,7 @@ function CardContainer(props: CardContainerProps) {
   return (
     <div className="card-container">
       {props.cards.map((card) => (
-        <Card id={card.id} key={card.id} imgSrc={card.imgSrc} date={card.date} label={card.label} isLocked={card.isLocked} onClick={props.onClick} />
+        <Card key={card.id} {...card} onClick={props.onClick} />
       ))}
     </div>
   );

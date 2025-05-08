@@ -1,10 +1,10 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks.ts";
 import { selectCards } from "../../store/selectors.ts";
+import { loadGalleryThunk, toggleLockThunk, updateGalleryThunk } from "../../store/thunks.ts";
 import CardContainer from "../organisms/CardContainer/CardContainer.tsx";
 import IconButton from "../molecules/IconButton/IconButton.tsx";
 import RefreshIcon from "../atoms/RefreshIcon/RefreshIcon.tsx";
-import { loadGalleryThunk, toggleLockThunk, updateGalleryThunk } from "../../store/thunks.ts";
 import "./GalleryPage.scss";
 
 const GALLERY_LIMIT = 12; // Could be an input to allow the user to get the number of GIFs they want to see

@@ -18,8 +18,8 @@ function Card(props: CardProps) {
     <div className="card" id={props.id}>
       <img className="card__img" src={props.imgSrc} alt={props.label || "GIF"} onClick={() => props.onClick?.(props.id)} />
       {props.isLocked !== undefined && <div className="card__lock">{props.isLocked ? <LockIcon /> : <LockOpenIcon />}</div>}
-      {props.date && <div className="card__date">{shortenedDate}</div>}
-      {props.label && <div className="card__label">{props.label}</div>}
+      <div className="card__date">{shortenedDate}</div>
+      <div className="card__label">{props.label}</div>
     </div>
   );
 }
