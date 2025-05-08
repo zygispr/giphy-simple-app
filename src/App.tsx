@@ -1,4 +1,3 @@
-import "./App.scss";
 import GalleryPage from "./components/pages/GalleryPage.tsx";
 
 function App() {

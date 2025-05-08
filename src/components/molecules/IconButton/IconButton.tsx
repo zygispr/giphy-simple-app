@@ -9,7 +9,7 @@ interface IconButtonProps extends ButtonProps {
 function IconButton(props: IconButtonProps) {
   return (
     <>
-      <Button className="icon-button" onClick={props.onClick}>
+      <Button className={`icon-button ${props.className ?? ""}`} onClick={props.onClick}>
         {props.icon}
         {props.children}
       </Button>
