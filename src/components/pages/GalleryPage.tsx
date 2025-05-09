@@ -23,6 +23,7 @@ function GalleryPage() {
   };
 
   useEffect(() => {
+    // This helps avoid double loadGalleryThunk dispatch when StrictMode is on
     if (!hasPageLoaded.current) {
       dispatch(loadGalleryThunk(GALLERY_LIMIT));
       hasPageLoaded.current = true;
