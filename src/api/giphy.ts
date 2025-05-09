@@ -3,7 +3,22 @@ import type { GiphyResponse, GiphyGif } from "./models/giphyResponse.ts";
 
 const { VITE_GIPHY_BASE_URL: GIPHY_BASE_URL, VITE_GIPHY_API_KEY: GIPHY_API_KEY, VITE_GIPHY_TOTAL_COUNT: GIPHY_TOTAL_COUNT } = import.meta.env;
 
+const abortControllers = new Map<string, AbortController>();
+
+function getOrCreateAbortController(key: string): AbortController {
+  if (abortControllers.has(key)) {
+    abortControllers.get(key)!.abort();
+  }
+
+  const newAbortController = new AbortController();
+  abortControllers.set(key, newAbortController);
+
+  return newAbortController;
+}
+
 export const fetchTrendingGifs = async (count: number): Promise<CardProps[]> => {
+  const abortController = getOrCreateAbortController("fetchTrendingGifs");
+
   try {
     const maxOffset = Math.max(0, GIPHY_TOTAL_COUNT - count);
     const offset = Math.floor(Math.random() * (maxOffset + 1));
@@ -19,7 +34,7 @@ export const fetchTrendingGifs = async (count: number): Promise<CardProps[]> => 
     });
     const url = `${GIPHY_BASE_URL}/${endpoint}?${queryParams.toString()}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: abortController.signal });
     if (!response.ok) {
       console.error(`Giphy API error (status code: ${response.status}, status text: ${response.statusText})`);
       return [];
@@ -38,7 +53,11 @@ export const fetchTrendingGifs = async (count: number): Promise<CardProps[]> => 
       })
     );
   } catch (error) {
-    console.error("Failed to fetch GIFs:", error);
+    if (error instanceof DOMException && error.name === "AbortError") {
+      console.warn("Giphy fetch aborted.");
+    } else {
+      console.error("Failed to fetch GIFs:", error);
+    }
     return [];
   }
 };
